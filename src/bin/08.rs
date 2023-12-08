@@ -61,11 +61,7 @@ pub fn part_two(input: &str) -> Option<u128> {
         .map(|(k, _)| *k)
         .collect::<Vec<_>>();
 
-    let mut io = std::io::stdout().lock();
-
-    let mut now = Instant::now();
-
-    for (i, instr) in instructions.enumerate() {
+    for instr in instructions {
         steps += 1;
 
         let mut mapped = starts.iter_mut().map(|key| {
@@ -87,12 +83,6 @@ pub fn part_two(input: &str) -> Option<u128> {
         }
 
         for _ in mapped {}
-
-        if i % 10000 == 0 && now.elapsed() > Duration::from_secs(5) {
-            let _ = io.write_fmt(format_args!("Checking for {starts:?}, {steps}\n"));
-
-            now = Instant::now();
-        }
     }
 
     Some(steps)
