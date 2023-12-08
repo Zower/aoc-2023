@@ -61,7 +61,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     for instr in instructions {
         let mut all_valid = true;
 
-        let _ = io.write_fmt(format_args!("Checking for {starts:?}"));
+        let _ = io.write_fmt(format_args!("Checking for {starts:?}\n"));
 
         for start_key in &mut starts {
             let start_value = &map[start_key];
