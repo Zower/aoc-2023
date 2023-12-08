@@ -1,4 +1,8 @@
-use std::{collections::HashMap, io::Write};
+use std::{
+    collections::HashMap,
+    io::Write,
+    time::{Duration, Instant},
+};
 
 advent_of_code::solution!(8);
 
@@ -58,10 +62,10 @@ pub fn part_two(input: &str) -> Option<u32> {
 
     let mut io = std::io::stdout().lock();
 
-    for instr in instructions {
-        let mut all_valid = true;
+    let mut now = Instant::now();
 
-        let _ = io.write_fmt(format_args!("Checking for {starts:?}\n"));
+    for (i, instr) in instructions.enumerate() {
+        let mut all_valid = true;
 
         for start_key in &mut starts {
             let start_value = &map[start_key];
@@ -83,6 +87,12 @@ pub fn part_two(input: &str) -> Option<u32> {
 
         if all_valid {
             break;
+        }
+
+        if i % 10000 == 0 && now.elapsed() > Duration::from_secs(5) {
+            let _ = io.write_fmt(format_args!("Checking for {starts:?}, {steps}\n"));
+
+            now = Instant::now();
         }
     }
 
