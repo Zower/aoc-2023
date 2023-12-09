@@ -1,9 +1,4 @@
-use std::{
-    io::Write,
-    time::{Duration, Instant},
-};
-
-use ahash::HashMap;
+use std::collections::HashMap;
 
 advent_of_code::solution!(8);
 
@@ -44,52 +39,71 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(steps)
 }
 
-pub fn part_two(input: &str) -> Option<u128> {
+pub fn part_two(input: &str) -> Option<u32> {
     let mut lines = input.lines();
 
     let instructions = lines.next().unwrap().chars().cycle();
 
     let _ = lines.next().unwrap();
 
-    let map: std::collections::HashMap<&str, Path<'_>, ahash::RandomState> = map(lines);
-
-    let mut steps: u128 = 0;
-
-    let mut starts = map
+    let map = map(lines);
+    let starts = map
         .iter()
         .filter(|(&k, _)| k.ends_with("A"))
         .map(|(k, _)| *k)
         .collect::<Vec<_>>();
 
-    for instr in instructions {
-        steps += 1;
+    let mut steps = vec![];
 
-        let mut mapped = starts.iter_mut().map(|key| {
-            let value = &map[key];
+    for start in starts {
+        let mut step = 0;
+        let mut k = start;
 
-            let path_to = if instr == 'R' {
-                value.right
-            } else {
-                value.left
+        for instr in instructions.clone() {
+            step += 1;
+
+            let next = &map[k];
+
+            let next_key = match instr {
+                'R' => next.right,
+                'L' => next.left,
+                _ => unreachable!(),
             };
 
-            *key = path_to;
+            if next_key.ends_with('Z') {
+                break;
+            }
 
-            unsafe { path_to.get_unchecked(2..3) == "Z" }
-        });
-
-        if mapped.all(|t| t) {
-            break;
+            k = next_key;
         }
 
-        for _ in mapped {}
+        steps.push(step)
     }
 
-    Some(steps)
+    Some(lcm(&steps))
+}
+
+pub fn lcm(numbers: &[u32]) -> u32 {
+    if numbers.len() == 1 {
+        return numbers[0];
+    }
+
+    let first = numbers[0];
+    let rest = lcm(&numbers[1..]);
+
+    first * rest / gcd(first, rest)
+}
+
+fn gcd(first: u32, second: u32) -> u32 {
+    if second == 0 {
+        return first;
+    }
+
+    gcd(second, first % second)
 }
 
 fn map<'a>(lines: impl Iterator<Item = &'a str>) -> HashMap<&'a str, Path<'a>> {
-    let mut map = HashMap::with_hasher(ahash::RandomState::new());
+    let mut map = HashMap::new();
 
     for line in lines {
         let mut split = line.split_whitespace();
