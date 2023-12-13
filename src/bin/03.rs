@@ -71,6 +71,10 @@ pub fn part_one(input: &str) -> Option<u32> {
 
     let mut sum = 0;
 
+    let mut line_sum = 0;
+
+    let mut line_i = 0;
+
     for (i, kind) in lines.iter().enumerate() {
         match kind {
             Kind::Num(_) => {
@@ -79,6 +83,15 @@ pub fn part_one(input: &str) -> Option<u32> {
 
                     if prev.is_some_and(|prev| matches!(prev, Kind::Num(_))) {
                         if !is_line_end(i - 1) {
+                            if is_line_end(i) {
+                                line_i += 1;
+
+                                sum += line_sum;
+
+                                println!("{line_sum}");
+
+                                line_sum = 0;
+                            }
                             continue;
                         }
                     }
@@ -110,10 +123,20 @@ pub fn part_one(input: &str) -> Option<u32> {
                 }
 
                 if any_valid {
-                    sum += final_num.parse::<u32>().unwrap();
+                    line_sum += final_num.parse::<u32>().unwrap();
                 }
             }
             _ => (),
+        }
+
+        if is_line_end(i) {
+            line_i += 1;
+
+            sum += line_sum;
+
+            println!("{line_sum}");
+
+            line_sum = 0;
         }
     }
 
